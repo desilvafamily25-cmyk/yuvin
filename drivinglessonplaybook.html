@@ -1,0 +1,652 @@
+<title>First Lesson Playbook — Victoria, Australia</title>
+<style>
+  :root {
+    --bg: #EEF1EF;
+    --surface: #FFFFFF;
+    --surface-raised: #FFFFFF;
+    --ink: #171A1D;
+    --muted: #5B6570;
+    --border: rgba(23,26,29,0.12);
+    --accent-red: #C81E37;
+    --accent-amber: #B87500;
+    --success: #23833F;
+    --track: rgba(23,26,29,0.08);
+    --shadow: 0 1px 2px rgba(20,23,26,0.06), 0 8px 24px rgba(20,23,26,0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171A;
+      --surface: #1D2226;
+      --surface-raised: #232930;
+      --ink: #EDEFF0;
+      --muted: #9AA3AB;
+      --border: rgba(237,239,240,0.14);
+      --accent-red: #FF5A72;
+      --accent-amber: #F2B705;
+      --success: #4CBB5D;
+      --track: rgba(237,239,240,0.10);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 28px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171A; --surface: #1D2226; --surface-raised: #232930; --ink: #EDEFF0;
+    --muted: #9AA3AB; --border: rgba(237,239,240,0.14); --accent-red: #FF5A72;
+    --accent-amber: #F2B705; --success: #4CBB5D; --track: rgba(237,239,240,0.10);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 28px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #EEF1EF; --surface: #FFFFFF; --surface-raised: #FFFFFF; --ink: #171A1D;
+    --muted: #5B6570; --border: rgba(23,26,29,0.12); --accent-red: #C81E37;
+    --accent-amber: #B87500; --success: #23833F; --track: rgba(23,26,29,0.08);
+    --shadow: 0 1px 2px rgba(20,23,26,0.06), 0 8px 24px rgba(20,23,26,0.07);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--bg); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .app {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    padding: max(14px, env(safe-area-inset-top)) 18px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .plate-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .l-plate {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 24px;
+    border-radius: 3px;
+    background: #fff;
+    border: 2px solid var(--accent-red);
+    color: var(--accent-red);
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h1 {
+    margin: 0 0 2px;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .sub {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .head-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+  .progress-count {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .progress-count b { color: var(--ink); }
+  .reset-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .track {
+    height: 4px;
+    border-radius: 4px;
+    background: var(--track);
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .track-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-red), var(--accent-amber));
+    border-radius: 4px;
+    transition: width 0.25s ease;
+  }
+
+  /* ---------- Carousel ---------- */
+  .viewport {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    display: flex;
+    scrollbar-width: none;
+  }
+  .viewport::-webkit-scrollbar { display: none; }
+
+  .slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px 18px 12px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 20px 20px;
+    box-shadow: var(--shadow);
+    min-height: calc(100% - 4px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stage-num {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--accent-red);
+  }
+  .stage-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    margin: 4px 0 10px;
+    text-wrap: balance;
+  }
+  .stage-note {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    padding: 10px 12px;
+    background: var(--track);
+    border-radius: 10px;
+    border-left: 3px solid var(--accent-amber);
+    margin-bottom: 16px;
+  }
+  .stage-note b { color: var(--ink); }
+
+  ul.checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .item:last-child { border-bottom: none; }
+  .tick {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    margin-top: 1px;
+    border-radius: 7px;
+    border: 2px solid var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  }
+  .item.done .tick {
+    background: var(--success);
+    border-color: var(--success);
+    transform: scale(1.02);
+  }
+  .tick svg {
+    width: 14px; height: 14px;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+  }
+  .item.done .tick svg { opacity: 1; }
+  .item-text {
+    font-size: 14.5px;
+    line-height: 1.42;
+    padding-top: 2px;
+  }
+  .item.done .item-text {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--border);
+  }
+  .item-text b { font-weight: 700; color: inherit; }
+
+  .card-footer-note {
+    margin-top: auto;
+    padding-top: 14px;
+    font-size: 11.5px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ---------- Bottom controls ---------- */
+  .controls {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px max(12px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    flex-shrink: 0;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface-raised);
+    color: var(--ink);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .nav-btn:active:not(:disabled) { transform: scale(0.94); }
+
+  .dots {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 4px 0;
+  }
+  .dots::-webkit-scrollbar { display: none; }
+  .dot {
+    flex-shrink: 0;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--track);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  .dot.active {
+    background: var(--accent-red);
+    width: 20px;
+    border-radius: 4px;
+  }
+  .dot.complete:not(.active) { background: var(--success); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track-fill, .tick, .nav-btn { transition: none; }
+  }
+
+  @media print {
+    body { background: #fff; }
+    .controls, header .reset-btn, header .track { display: none; }
+    .viewport { overflow: visible; display: block; height: auto; }
+    .slide { flex: none; overflow: visible; height: auto; padding: 0 0 18px; page-break-inside: avoid; }
+    .card { box-shadow: none; border: 1px solid #ccc; }
+  }
+</style>
+
+<div class="app">
+  <header>
+    <div class="plate-row">
+      <span class="l-plate">L</span>
+      <div>
+        <div class="eyebrow">Instructor Playbook · Victoria, Australia</div>
+        <h1>First Lesson, Start to Finish</h1>
+      </div>
+    </div>
+    <p class="sub">Swipe through each stage. Tick off every point before you move to the next one.</p>
+    <div class="head-meta">
+      <span class="progress-count mono"><b id="doneCount">0</b>/<span id="totalCount">0</span> points ticked</span>
+      <button class="reset-btn" id="resetBtn">Reset all</button>
+    </div>
+    <div class="track"><div class="track-fill" id="trackFill" style="width:0%"></div></div>
+  </header>
+
+  <div class="viewport" id="viewport"></div>
+
+  <div class="controls">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous stage">‹</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-btn" id="nextBtn" aria-label="Next stage">›</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var STAGES = [
+    {
+      title: "Legal Checks, Before You Touch the Key",
+      note: "This is the part that keeps you both covered. Do it every single lesson, not just the first one.",
+      items: [
+        "Learner permit is valid and physically in the car",
+        "Red L plates fitted front <b>and</b> rear, clearly visible",
+        "You (the supervisor) hold a <b>full</b> Australian licence — a P1/P2 licence cannot legally supervise a learner in Victoria",
+        "Car is registered, roadworthy, and insurance covers a learner driver",
+        "Learner's BAC is zero — no exceptions",
+        "Phones are away and silenced for <b>both</b> of you — learners can't legally use one at all while driving, not even hands-free",
+        "Logbook (paper or app) is ready to record this drive toward the 120-hour / 10-night-hour requirement"
+      ]
+    },
+    {
+      title: "Pick the Right Place and Time",
+      note: "Where you start decides how the whole lesson feels. Low stakes first, real roads later.",
+      items: [
+        "Empty car park or a very quiet residential street for lesson one",
+        "Daylight, dry weather, minimal other traffic",
+        "No appointment to rush to afterwards — cancel if either of you is tired, rushed or tense",
+        "Agree the lesson length up front (45–60 min is plenty for a first go)",
+        "Decide together on a simple stop signal, e.g. \"pull over when you can\""
+      ]
+    },
+    {
+      title: "Cockpit Drill, Engine Off",
+      note: "Every good habit starts here. Rushing this step is where sloppy driving begins.",
+      items: [
+        "Seat distance and height set — full pedal travel, clear view over the wheel",
+        "Head restraint adjusted to sit level with the back of the head",
+        "Rear-view mirror and both side mirrors adjusted",
+        "Seatbelt on, doors closed and locked",
+        "Learner can find accelerator, brake (and clutch, if manual) without looking down",
+        "Handbrake / electronic park brake located and tested"
+      ]
+    },
+    {
+      title: "Know the Controls",
+      note: "Point to each one and have them touch it. Muscle memory now saves panic later.",
+      items: [
+        "Indicators, headlights and high beam",
+        "Windscreen wipers and demister",
+        "Gear selector — P/R/N/D, or the manual H-pattern including reverse",
+        "Hazard lights and horn location",
+        "Where the speedometer and fuel gauge sit in their eyeline"
+      ]
+    },
+    {
+      title: "Starting Up and Moving Off",
+      note: "The single most common stall point. Keep it slow and let them find the feel.",
+      items: [
+        "Gear in Park/Neutral (or clutch fully down) before starting the engine",
+        "Foot on the brake while starting",
+        "Mirror – blind spot check – indicate, before releasing the brake",
+        "<b>Manual:</b> find the biting point, ease the clutch up gently",
+        "<b>Automatic:</b> control the creep, light and even accelerator pressure",
+        "Move off smoothly, no harsh acceleration"
+      ]
+    },
+    {
+      title: "Steering and Basic Control",
+      note: "Good hands now prevent bad habits that are hard to unlearn in six months.",
+      items: [
+        "Hands at roughly 9 and 3 o'clock on the wheel",
+        "Push-pull steering, no crossed arms",
+        "Small, smooth corrections rather than sharp jerks",
+        "Practise a straight line first, then gentle sweeping curves",
+        "Eyes up and well ahead, not fixed on the bonnet"
+      ]
+    },
+    {
+      title: "Stopping Smoothly",
+      note: "A smooth stop is a sign of a driver reading the road, not just reacting to it.",
+      items: [
+        "Progressive brake pressure, easing off just before the car stops",
+        "Come to a complete, controlled stop each time",
+        "Handbrake applied on any incline or extended stop",
+        "Repeat start-stop cycles until it feels natural, not rushed"
+      ]
+    },
+    {
+      title: "Observation Habits (MSM)",
+      note: "Mirror – Signal – Manoeuvre, said out loud, every single time, until it's automatic.",
+      items: [
+        "Mirror check before any change of speed, direction or lane",
+        "Signal early enough for others to react",
+        "Head / blind-spot check before moving off or turning",
+        "Scanning well down the road, not just the car ahead",
+        "Mirror check roughly every 5–8 seconds while driving"
+      ]
+    },
+    {
+      title: "First Manoeuvres",
+      note: "Keep speeds low. The goal today is confidence and control, not distance covered.",
+      items: [
+        "Repeated low-speed starts and stops (around 20–30 km/h in a car park)",
+        "Gentle left and right turns at low speed",
+        "A simple straight-line reverse, if space allows",
+        "Save three-point turns and reverse parking for a later lesson"
+      ]
+    },
+    {
+      title: "Road Rules Refresher, Victoria",
+      note: "Say these out loud before you leave the car park, even if they already know them.",
+      items: [
+        "Default urban speed limit is 50 km/h unless signed otherwise",
+        "School zones are 40 km/h during the signed times",
+        "Give way to traffic on the right at uncontrolled intersections",
+        "Give way to traffic already in a roundabout",
+        "Full stop behind the line at every stop sign — not a rolling stop",
+        "Keep left unless overtaking or turning right"
+      ]
+    },
+    {
+      title: "Emergency Stop Practice",
+      note: "Only once they're comfortable with normal stops — and only when you can guarantee no traffic behind you.",
+      items: [
+        "Explain and agree the exercise fully before attempting it",
+        "Confirm the space is clear in both directions",
+        "Firm, controlled brake pressure, both hands on the wheel",
+        "Check mirrors immediately after stopping",
+        "Debrief how it felt straight away"
+      ]
+    },
+    {
+      title: "Debrief and Logbook",
+      note: "How this five minutes goes decides whether they want a second lesson.",
+      items: [
+        "Lead with what went well, specifically",
+        "Choose one or two things to focus on next time — not a long list",
+        "Log the drive: date, duration, conditions, distance",
+        "Ask how they felt — confidence check, not a test",
+        "Set a date and time for lesson two before you finish"
+      ]
+    }
+  ];
+
+  var viewport = document.getElementById("viewport");
+  var dotsWrap = document.getElementById("dots");
+  var prevBtn = document.getElementById("prevBtn");
+  var nextBtn = document.getElementById("nextBtn");
+  var trackFill = document.getElementById("trackFill");
+  var doneCountEl = document.getElementById("doneCount");
+  var totalCountEl = document.getElementById("totalCount");
+  var resetBtn = document.getElementById("resetBtn");
+
+  var STORAGE_KEY = "driving-lesson-playbook-v1";
+  var state = {};
+  try {
+    state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch (e) { state = {}; }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  var totalItems = 0;
+  STAGES.forEach(function (s) { totalItems += s.items.length; });
+  totalCountEl.textContent = totalItems;
+
+  function checkIcon() {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+  }
+
+  STAGES.forEach(function (stage, si) {
+    var slide = document.createElement("div");
+    slide.className = "slide";
+    slide.id = "slide-" + si;
+
+    var card = document.createElement("div");
+    card.className = "card";
+
+    var num = document.createElement("div");
+    num.className = "stage-num mono";
+    num.textContent = "STAGE " + String(si + 1).padStart(2, "0") + " / " + String(STAGES.length).padStart(2, "0");
+    card.appendChild(num);
+
+    var title = document.createElement("div");
+    title.className = "stage-title";
+    title.textContent = stage.title;
+    card.appendChild(title);
+
+    var note = document.createElement("div");
+    note.className = "stage-note";
+    note.innerHTML = stage.note;
+    card.appendChild(note);
+
+    var ul = document.createElement("ul");
+    ul.className = "checklist";
+
+    stage.items.forEach(function (text, ii) {
+      var key = si + "-" + ii;
+      var li = document.createElement("li");
+      li.className = "item" + (state[key] ? " done" : "");
+      li.setAttribute("role", "checkbox");
+      li.setAttribute("aria-checked", state[key] ? "true" : "false");
+      li.tabIndex = 0;
+      li.innerHTML =
+        '<span class="tick">' + checkIcon() + '</span>' +
+        '<span class="item-text">' + text + '</span>';
+      li.addEventListener("click", function () { toggle(key, li); });
+      li.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(key, li); }
+      });
+      ul.appendChild(li);
+    });
+
+    card.appendChild(ul);
+
+    var footNote = document.createElement("div");
+    footNote.className = "card-footer-note";
+    footNote.textContent = si === STAGES.length - 1
+      ? "Nice work — see you at lesson two."
+      : "Swipe left, or use the arrows below, for the next stage.";
+    card.appendChild(footNote);
+
+    slide.appendChild(card);
+    viewport.appendChild(slide);
+
+    var dot = document.createElement("button");
+    dot.className = "dot";
+    dot.setAttribute("aria-label", "Go to stage " + (si + 1));
+    dot.addEventListener("click", function () { goTo(si); });
+    dotsWrap.appendChild(dot);
+  });
+
+  function toggle(key, li) {
+    state[key] = !state[key];
+    li.classList.toggle("done", state[key]);
+    li.setAttribute("aria-checked", state[key] ? "true" : "false");
+    save();
+    updateProgress();
+  }
+
+  function updateProgress() {
+    var done = 0;
+    Object.keys(state).forEach(function (k) { if (state[k]) done++; });
+    doneCountEl.textContent = done;
+    trackFill.style.width = (totalItems ? (done / totalItems * 100) : 0) + "%";
+
+    var dots = dotsWrap.querySelectorAll(".dot");
+    STAGES.forEach(function (stage, si) {
+      var stageDone = 0;
+      stage.items.forEach(function (_, ii) { if (state[si + "-" + ii]) stageDone++; });
+      dots[si].classList.toggle("complete", stageDone === stage.items.length);
+    });
+  }
+
+  var current = 0;
+  function updateActive() {
+    var idx = Math.round(viewport.scrollLeft / viewport.clientWidth);
+    idx = Math.max(0, Math.min(STAGES.length - 1, idx));
+    current = idx;
+    var dots = dotsWrap.querySelectorAll(".dot");
+    dots.forEach(function (d, i) { d.classList.toggle("active", i === idx); });
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === STAGES.length - 1;
+
+    var activeDot = dots[idx];
+    if (activeDot) activeDot.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+  }
+
+  function goTo(idx) {
+    idx = Math.max(0, Math.min(STAGES.length - 1, idx));
+    document.getElementById("slide-" + idx).scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+  }
+
+  var scrollTimer;
+  viewport.addEventListener("scroll", function () {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(updateActive, 60);
+  });
+
+  prevBtn.addEventListener("click", function () { goTo(current - 1); });
+  nextBtn.addEventListener("click", function () { goTo(current + 1); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") goTo(current + 1);
+    if (e.key === "ArrowLeft") goTo(current - 1);
+  });
+
+  resetBtn.addEventListener("click", function () {
+    if (!confirm("Clear every ticked point across all stages?")) return;
+    state = {};
+    save();
+    document.querySelectorAll(".item").forEach(function (li) {
+      li.classList.remove("done");
+      li.setAttribute("aria-checked", "false");
+    });
+    updateProgress();
+  });
+
+  updateProgress();
+  updateActive();
+})();
+</script>
